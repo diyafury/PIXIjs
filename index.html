@@ -32,7 +32,7 @@
         /* SPACESHIP */
 
         // Magically load the PNG asynchronously
-        let spaceship = PIXI.Sprite.from('/img/spaceship.png');
+        let spaceship = PIXI.Sprite.from('./img/spaceship.png');
         spaceship.y = 440;
         spaceship.width = spaceship.height = 200;
 
@@ -58,7 +58,7 @@
         app.stage.addChild(container);
 
         // Create a new texture
-        const texture = PIXI.Texture.from('/img/bunny.png');
+        const texture = PIXI.Texture.from('./img/bunny.png');
 
         // Create a 5x5 grid of bunnies
         for (let i = 0; i < 25; i++) {
@@ -156,7 +156,7 @@
         document.getElementById('app2').appendChild(app2.view);
         app2.stage.interactive = true;
 
-        const bg = PIXI.Sprite.from('/img/bg_rotate.jpg');
+        const bg = PIXI.Sprite.from('./img/bg_rotate.jpg');
         bg.anchor.set(0.5);
         bg.x = app2.screen.width / 2;
         bg.y = app2.screen.height / 2;
@@ -170,16 +170,16 @@
         container2.y = app.screen.height / 2;
 
         // add a bunch of sprites
-        const bgFront = PIXI.Sprite.from('/img/bg_scene_rotate.jpg');
+        const bgFront = PIXI.Sprite.from('./img/bg_scene_rotate.jpg');
         bgFront.anchor.set(0.5);
 
-        const light2 = PIXI.Sprite.from('/img/light_rotate_2.png');
+        const light2 = PIXI.Sprite.from('./img/light_rotate_2.png');
         light2.anchor.set(0.5);
 
-        const light1 = PIXI.Sprite.from('/img/light_rotate_1.png');
+        const light1 = PIXI.Sprite.from('./img/light_rotate_1.png');
         light1.anchor.set(0.5);
 
-        const panda = PIXI.Sprite.from('/img/panda.png');
+        const panda = PIXI.Sprite.from('./img/panda.png');
         panda.anchor.set(0.5);
 
         container2.addChild(bgFront, light2, light1, panda);
