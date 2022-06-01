@@ -1,0 +1,241 @@
+<!doctype html>
+<html>
+    <head>
+        <title>pixieJS app</title>
+        <link href="https://diyafury.github.io/works/css/base.css" rel="stylesheet" />
+        <style type="text/css">
+            section {
+                display: flex;
+                justify-content: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>PixiJS</h1>
+            <section id="app1"></section>
+            <section id="app2"></section>
+        </div>
+    </body>
+
+    <script src="https://pixijs.download/release/pixi.min.js"></script>
+    <script>
+        let app = new PIXI.Application({ 
+            //width: 640, height: 360 
+            width: 800, 
+            height: 600, 
+            backgroundColor: 0x1099bb, 
+            resolution: window.devicePixelRatio || 1,
+        });
+        document.getElementById('app1').appendChild(app.view);
+
+        /* SPACESHIP */
+
+        // Magically load the PNG asynchronously
+        let spaceship = PIXI.Sprite.from('/img/spaceship.png');
+        spaceship.y = 440;
+        spaceship.width = spaceship.height = 200;
+
+        // The sprite is rendered by the app automatically multiple times per second in the same place, we just need to move it
+        app.stage.addChild(spaceship);
+
+        // Add a variable to count up the seconds our demo has been running
+        let elapsed = 0.0;
+        // Tell our applications' ticker (runs mutliple callbacks per frame) to run a new callback every frame, passing...
+        // ... in the amount of time that has passed since the last tick
+        app.ticker.add( (delta) => {
+            // Add the time to our total elapsed time
+            elapsed += delta;
+            // Update the sprite's X position based on the cosine of our elapsed time. We deivide by 50 to slow the animation down a bit.
+            spaceship.x = 300.0 + Math.cos(elapsed/50.0) * 350.0;
+            spaceship.tint = Math.random() * 0xFFFFFF;
+        });
+
+        /* /SPACESHIP */
+
+        /* BUNNY GRID (using a container) */
+        const container = new PIXI.Container();
+        app.stage.addChild(container);
+
+        // Create a new texture
+        const texture = PIXI.Texture.from('/img/bunny.png');
+
+        // Create a 5x5 grid of bunnies
+        for (let i = 0; i < 25; i++) {
+            const bunny = new PIXI.Sprite(texture);
+            bunny.anchor.set(0.5);
+            bunny.x = (i % 5) * 40;
+            bunny.y = Math.floor(i / 5) * 40;
+            bunny.tint = Math.random() * 0xFFFFFF;
+            container.addChild(bunny);
+        }
+
+        // Move container to the center
+        container.x = app.screen.width / 2;
+        container.y = app.screen.height / 2;
+
+        // Center bunny sprite in local container coordinates
+        container.pivot.x = container.width / 2;
+        container.pivot.y = container.height / 2;
+
+        // Listen for animate update
+        app.ticker.add((delta) => {
+            // rotate the container!
+            // use delta to create frame-independent transform
+            container.rotation -= 0.01 * delta;
+            container.children.forEach(bunny => {
+                bunny.rotation += 0.01 * delta;
+            });
+        });
+
+        /* /BUNNY GRID */
+
+        /* MASKING */
+        // Create window frame
+        let frame = new PIXI.Graphics();
+        frame.beginFill(0x6495ed);
+        frame.lineStyle({ color: 0xffffff, width: 4, alignment: 0 });
+        frame.drawRect(0, 0, 208, 208);
+        frame.position.set(20, 20);
+        app.stage.addChild(frame);
+
+        // Create a graphics object to define our mask
+        let mask = new PIXI.Graphics();
+        // Add the rectangular area to show
+        mask.beginFill(0xffffff);
+        mask.drawRect(0,0,200,200);
+        mask.endFill();
+
+        // Add container that will hold our masked content
+        let maskContainer = new PIXI.Container();
+        // Set the mask to use our graphics object from above
+        maskContainer.mask = mask;
+        // Add the mask as a child, so that the mask is positioned relative to its parent
+        maskContainer.addChild(mask);
+        // Offset by the window's frame width
+        maskContainer.position.set(4,4);
+        // Add a filter
+        //maskContainer.filters = [new PIXI.filters.BlurFilter()];
+        // And add the container to the window!
+        frame.addChild(maskContainer);
+
+        // Create contents for the masked container: http://www.cupcakeipsum.com/
+        let text = new PIXI.Text(
+        'Chocolate cake soufflé fruitcake sesame snaps cake wafer pastry. Cotton candy biscuit macaroon toffee sesame snaps powder. Sugar plum wafer gummies bear claw sugar plum chupa chups. Topping caramels gummies tootsie roll wafer ice cream cake apple pie.\n\n' +
+        'Chocolate bar jelly beans croissant chocolate cake chocolate cake powder tiramisu. Ice cream marzipan sweet roll jujubes jelly candy cookie gingerbread. Pie chocolate bar dragée tart muffin cheesecake candy canes topping.\n\n' +
+        'Icing wafer chocolate cake lollipop sesame snaps candy canes. Tart macaroon gummi bears apple pie cookie tiramisu ice cream jelly. Gingerbread sugar plum oat cake candy cake jujubes.\n\n' +
+        'Soufflé apple pie caramels tootsie roll dessert. Dragée toffee chocolate cake donut tootsie roll cheesecake tootsie roll cookie sesame snaps. Candy dessert biscuit ice cream jelly beans pastry candy canes cake.\n\n' +
+        'Chocolate tart dessert tootsie roll caramels powder pie pudding. Chocolate marshmallow cupcake cotton candy cake gummies halvah fruitcake. Cheesecake bear claw halvah lemon drops sweet muffin jelly candy canes cotton candy. Dragée sugar plum jelly bonbon jelly ice cream.',
+        {
+            fontSize: 16,
+            fill: 0xffffff,
+            wordWrap: true,
+            wordWrapWidth: 180
+        }
+        );
+        text.x = 10;
+        text.y = 10;
+        maskContainer.addChild(text);
+
+        // Add a ticker callback to scroll the text up and down
+        let elapsed2 = 0.0;
+        app.ticker.add((delta) => {
+            // Update the text's y coordinate to scroll it
+            elapsed2 += delta;
+            text.y = 10 + -460.0 + Math.cos(elapsed2/50.0) * 460.0;
+        });
+
+        /* /MASKING */
+
+        /* COMPLEX MASKING */
+        let app2 = new PIXI.Application({ 
+            antialiased: true,
+            width: 800,
+            height: 600
+        });
+        document.getElementById('app2').appendChild(app2.view);
+        app2.stage.interactive = true;
+
+        const bg = PIXI.Sprite.from('/img/bg_rotate.jpg');
+        bg.anchor.set(0.5);
+        bg.x = app2.screen.width / 2;
+        bg.y = app2.screen.height / 2;
+        bg.width = app2.screen.width * 1.25;
+        bg.height = bg.width;
+
+        app2.stage.addChild(bg);
+
+        const container2 = new PIXI.Container();
+        container2.x = app.screen.width / 2;
+        container2.y = app.screen.height / 2;
+
+        // add a bunch of sprites
+        const bgFront = PIXI.Sprite.from('/img/bg_scene_rotate.jpg');
+        bgFront.anchor.set(0.5);
+
+        const light2 = PIXI.Sprite.from('/img/light_rotate_2.png');
+        light2.anchor.set(0.5);
+
+        const light1 = PIXI.Sprite.from('/img/light_rotate_1.png');
+        light1.anchor.set(0.5);
+
+        const panda = PIXI.Sprite.from('/img/panda.png');
+        panda.anchor.set(0.5);
+
+        container2.addChild(bgFront, light2, light1, panda);
+
+        app2.stage.addChild(container2);
+
+        // let's create a moving shape
+        const thing = new PIXI.Graphics();
+        app2.stage.addChild(thing);
+        thing.x = app.screen.width / 2;
+        thing.y = app.screen.height / 2;
+        thing.lineStyle(0);
+
+        container2.mask = thing;
+
+        let count = 0;
+
+        app2.stage.on('pointertap', () => {
+            if (!container2.mask) {
+                container2.mask = thing;
+            } else {
+                container2.mask = null;
+            }
+        });
+
+        const help = new PIXI.Text('Click or tap to turn masking on / off', {
+            fontFmaily: 'Arial',
+            fontSize: 12,
+            fontWeight: 'bold',
+            fill: 'white',
+        });
+        help.y = app2.screen.height - 26;
+        help.x = 10;
+        app2.stage.addChild(help);
+
+        app.ticker.add(() => {
+            bg.rotation += 0.01;
+            bgFront.rotation -= 0.01;
+            
+            light1.rotation += 0.02;
+            light2.rotation += 0.2;
+
+            panda.scale.x = 1 + Math.sin(count) * 0.04;
+            panda.scale.y = 1 + Math.cos(count) * 0.04;
+
+            count += 0.1;
+
+            thing.clear();
+
+            thing.beginFill(0x8bc5ff, 0.4);
+            thing.moveTo(-120 + Math.sin(count) * 20, -100 + Math.cos(count) *20);
+            thing.lineTo(120 + Math.cos(count) * 20, -100 + Math.sin(count) * 20);
+            thing.lineTo(120 + Math.sin(count) * 20, 100 + Math.cos(count) * 20);
+            thing.lineTo(-120 + Math.cos(count) * 20, 100 + Math.sin(count) * 20);
+            thing.rotation = count * 0.1;
+        });
+        /* /COMPLEX MASKING */
+    </script>
+</html>
