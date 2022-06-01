@@ -1,0 +1,12 @@
+{
+  "name": "PIXIjs",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://diyafury.github.io/PIXIjs/",
+  "devDependencies": {
+    "gh-pages": "^4.0.0"
+  },
+  "scripts": {
+    "deploy": "gh-pages -d build"
+  }
+}
